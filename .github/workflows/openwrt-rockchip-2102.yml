@@ -2,23 +2,24 @@
 # Description: Build OpenWrt using GitHub Actions
 # Lisence: MIT
 
-name: OpenWRT-21.02
+name: OpenWrt-21.02-ao
 
 on:
 #  release:
 #    types: published
-  push:
-    branches:
-      - 21.02
-    paths:
-      - '.github/workflows/openwrt-rockchip-2102.yml'
-      - 'step/00-prepare_openwrt.sh'
-      - 'step/01-prepare_package.sh'
-      - 'seed/rockchip.seed'
-  schedule:
-    - cron: 30 21 * * *
+  #push:
+  #  branches:
+  #    - 21.02
+  #  paths:
+  #    - '.github/workflows/openwrt-rockchip-2102.yml'
+  #    - 'step/00-prepare_openwrt.sh'
+  #    - 'step/01-prepare_package.sh'
+  #    - 'seed/rockchip.seed'
+  #schedule:
+  #  - cron: 30 21 * * *
   watch:
     types: started
+  workflow_dispatch:
 
 jobs:
     build:
@@ -40,7 +41,7 @@ jobs:
           echo "UPLOAD_BIN_DIR=false" >> $GITHUB_ENV
           echo "UPLOAD_FIRMWARE=true" >> $GITHUB_ENV
           echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
-          echo "TZ=Asia/Shanghai" >>$GITHUB_ENV
+          echo "TZ=Europe/Paris" >>$GITHUB_ENV
           echo "Build_Date=$(date +%Y.%m.%d)" >> $GITHUB_ENV
           
       - name: Show env
@@ -115,7 +116,7 @@ jobs:
         run: |
           echo '================================================================'
           cd openwrt && make toolchain/install -j1 V=s
-      - name: Compile OpenWRT for R2S & R4S & R1-plus
+      - name: Compile OpenWRT for R2S & R4S
         id: compileopenwrt
         continue-on-error: true
         run: |
@@ -152,15 +153,12 @@ jobs:
           gzip -d *.gz && exit 0
           gzip --best *.img
           ls -Ahl
-          sha256sum openwrt*r2s* | tee R2S-QC-$(date +%Y-%m-%d)-21.02.sha256sum
-          sha256sum openwrt*r4s* | tee R4S-QC-$(date +%Y-%m-%d)-21.02.sha256sum
-          sha256sum openwrt*r1-plus* | tee R1-plus-QC-$(date +%Y-%m-%d)-21.02.sha256sum
-          zip R2S-QC-$(date +%Y-%m-%d)-21.02-ext4.zip *r2s*ext4*
-          zip R2S-QC-$(date +%Y-%m-%d)-21.02-sfs.zip *r2s*squashfs*
-          zip R4S-QC-$(date +%Y-%m-%d)-21.02-ext4.zip *r4s*ext4*
-          zip R4S-QC-$(date +%Y-%m-%d)-21.02-sfs.zip *r4s*squashfs*
-          zip R1-plus-QC-$(date +%Y-%m-%d)-21.02-ext4.zip *r1-plus*ext4*
-          zip R1-plus-QC-$(date +%Y-%m-%d)-21.02-sfs.zip *r1-plus*squashfs*   
+          sha256sum openwrt*r2s* | tee R2S-AO-$(date +%Y%m%d)-21.02.sha256sum
+          sha256sum openwrt*r4s* | tee R4S-AO-$(date +%Y%m%d)-21.02.sha256sum
+          zip R2S-AO-$(date +%Y%m%d)-21.02-ext4.zip *r2s*ext4*
+          zip R2S-AO-$(date +%Y%m%d)-21.02-sfs.zip *r2s*squashfs*
+          zip R4S-AO-$(date +%Y%m%d)-21.02-ext4.zip *r4s*ext4*
+          zip R4S-AO-$(date +%Y%m%d)-21.02-sfs.zip *r4s*squashfs* 
           cp ../openwrt/*.config ./
           ls -Ahl
       - name: Upload artifact
