@@ -43,6 +43,7 @@ jobs:
           echo "UPLOAD_RELEASE=true" >> $GITHUB_ENV
           echo "TZ=Europe/Paris" >>$GITHUB_ENV
           echo "Build_Date=$(date +%Y.%m.%d)" >> $GITHUB_ENV
+          echo "RELTAG=v$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
           
       - name: Show env
         run: echo $GITHUB_ENV
@@ -159,12 +160,12 @@ jobs:
           gzip -d *.gz && exit 0
           gzip --best *.img
           ls -Ahl
-          sha256sum openwrt*r2s* | tee R2S-AO-$(date +%Y%m%d)-21.02.sha256sum
-          sha256sum openwrt*r4s* | tee R4S-AO-$(date +%Y%m%d)-21.02.sha256sum
-          zip R2S-AO-$(date +%Y%m%d)-21.02-ext4.zip *r2s*ext4*
-          zip R2S-AO-$(date +%Y%m%d)-21.02-sfs.zip *r2s*squashfs*
-          zip R4S-AO-$(date +%Y%m%d)-21.02-ext4.zip *r4s*ext4*
-          zip R4S-AO-$(date +%Y%m%d)-21.02-sfs.zip *r4s*squashfs* 
+          sha256sum openwrt*r2s* | tee NanoPI-R2S-AO-$(date +%Y%m%d)-21.02.sha256sum
+          sha256sum openwrt*r4s* | tee NanoPI-R4S-AO-$(date +%Y%m%d)-21.02.sha256sum
+          zip NanoPI-R2S-AO-$(date +%Y%m%d)-21.02-ext4.zip *r2s*ext4*
+          zip NanoPI-R2S-AO-$(date +%Y%m%d)-21.02-sfs.zip *r2s*squashfs*
+          zip NanoPI-R4S-AO-$(date +%Y%m%d)-21.02-ext4.zip *r4s*ext4*
+          zip NanoPI-R4S-AO-$(date +%Y%m%d)-21.02-sfs.zip *r4s*squashfs* 
           cp ../openwrt/*.config ./
           ls -Ahl
       - name: Upload artifact
@@ -179,9 +180,9 @@ jobs:
         uses: ncipollo/release-action@v1.8.0
         if: env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          name: OpenWRT-21.02-for-rockchip
+          name: OpenWRT-21.02-${{ env.Build_Date }} 
           allowUpdates: true
-          tag: 2102
+          tag: ${{ env.RELTAG }}
           commit: 21.02
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
