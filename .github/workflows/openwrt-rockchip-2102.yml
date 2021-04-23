@@ -67,10 +67,16 @@ jobs:
           sudo -E apt-get clean -y
           git config --global user.name 'GitHub Actions' && git config --global user.email 'noreply@github.com'
           df -h
-      - name: Install OpenWrt source
+      - name: Get OpenWrt source
         run: |
-          git clone -b openwrt-21.02 --single-branch https://git.openwrt.org/openwrt/openwrt.git openwrt
-      - name: Prepare openwrt
+          /bin/bash 01a_clone_openwrt.sh
+      - name: Get ImmortalWrt source
+        run: |
+          /bin/bash 01b_clone_immortal.sh
+      - name: Patch OpenWrt source
+        run: |
+          /bin/bash 02_patch_openwrt.sh
+      - name: Patch OpenWrt source 2
         run: |
           cd openwrt
           cp -r ../step/* ./
@@ -88,12 +94,12 @@ jobs:
         run: |
           cd openwrt
           /bin/bash 03-create_acl_for_luci.sh -a
-      - name: Load Multiple devices Config
+      - name: Load ao Config
         run: |
           cd openwrt
-          mv ../seed/rockchip.seed .config
+          mv ../seed/ao.seed .config
           make defconfig
-          cp .config  rockchip_multi.config
+          cp .config  ao.config
           
       - name: Download package
         id: package
@@ -178,6 +184,6 @@ jobs:
           tag: 2102
           commit: 21.02
           replacesArtifacts: true
-          token: ${{ secrets.RELEASES_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           bodyFile: "body-origin-21.02.md"
           artifacts: ./artifact/*.zip,./artifact/*.config,./artifact/*.sha256sum
