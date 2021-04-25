@@ -74,9 +74,12 @@ jobs:
       - name: Get ImmortalWrt source
         run: |
           /bin/bash 01b_clone_immortal.sh
+      - name: Copy OpenWrt source
+        run: |
+          /bin/bash 02_copy_openwrt.sh
       - name: Patch OpenWrt source
         run: |
-          /bin/bash 02_patch_openwrt.sh
+          /bin/bash 03_patch_openwrt.sh
       - name: Patch OpenWrt source 2
         run: |
           cd openwrt
@@ -174,16 +177,22 @@ jobs:
         with:
           name: OpenWRT_21.02
           path: ./artifact/
+          
+      - name: Set env
+        run: |
+          echo "TZ=Europe/Paris" >>$GITHUB_ENV
+          echo "Build_Date=$(date +%Y-%m-%d %H:%M)" >> $GITHUB_ENV
+          echo "RELTAG=v$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
 
       - name: Create release
         id: create_release
         uses: ncipollo/release-action@v1.8.0
         if: env.UPLOAD_RELEASE == 'true' && !cancelled()
         with:
-          name: OpenWRT-21.02-${{ env.Build_Date }} 
+          name: OpenWrt 21.02 ${{ env.Build_Date }} 
           allowUpdates: true
-          tag: ${{ env.RELTAG }}
-          commit: 21.02
+          #tag: ${{ env.RELTAG }}
+          #commit: 21.02
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           bodyFile: "body-origin-21.02.md"
