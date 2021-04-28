@@ -181,7 +181,7 @@ jobs:
       - name: Set env
         run: |
           echo "TZ=Europe/Paris" >>$GITHUB_ENV
-          echo "Build_Date=$(date +%Y-%m-%d %H:%M)" >> $GITHUB_ENV
+          echo "Build_Date=$(date +'%Y-%m-%d %H:%M')" >> $GITHUB_ENV
           echo "RELTAG=v$(date +'%Y%m%d.%H%M%S')" >> $GITHUB_ENV
 
       - name: Create release
@@ -192,7 +192,7 @@ jobs:
           name: OpenWrt 21.02 ${{ env.Build_Date }} 
           allowUpdates: true
           tag: ${{ env.RELTAG }}
-          #commit: 21.02
+          commit: 21.02
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
           bodyFile: "body-origin-21.02.md"
